@@ -1,26 +1,40 @@
 package presentation;
 
+import domain.Gomoku;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import java.io.File;
 
 public class GomokuGUI extends JFrame {
+
+    private Gomoku gomoku;
     private JPanel[][] boardPanels;
+    private int currentPlayerTurn = 1;
+
+    private Color[] playersColors = {
+            Color.BLACK,
+            Color.WHITE
+    };
 
     public GomokuGUI() {
         setTitle("Gomoku POOs");
         boardPanels = new JPanel[15][15];
+        gomoku = new Gomoku(); // Puedes ajustar la inicialización según tus necesidades
         prepareElements();
         prepareActions();
     }
 
     private void prepareElements() {
-        int width = 800;
+        int width = 750;
         int height = 800;
         setSize(width, height);
         setLocationRelativeTo(null);
+        setResizable(false); // Evitar que la ventana sea redimensionable
+
 
         prepareElementsMenu();
         prepareElementsBoard();
@@ -35,7 +49,7 @@ public class GomokuGUI extends JFrame {
             }
         });
         prepareActionsMenu();
-        prepareActionsBoard();
+        prepareActionsBoard();  // Agrega esta línea para preparar las acciones del tablero
     }
 
     private void confirmExit() {
@@ -99,35 +113,105 @@ public class GomokuGUI extends JFrame {
     }
 
     private void prepareElementsBoard() {
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        String imagePath = "./images/img.jpg";
+        ImagePanel outerOuterPanel = new ImagePanel(imagePath);
 
-        JPanel borderPanel = new JPanel(new BorderLayout());
-        // Ajusta los márgenes según tus necesidades
-        borderPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+        outerOuterPanel.setLayout(new BorderLayout());
+        outerOuterPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+
+        JPanel outerPanel = new JPanel();
+        outerPanel.setOpaque(false);
+        outerPanel.setLayout(new BorderLayout());
 
         JPanel boardContainerPanel = new JPanel();
+        boardContainerPanel.setOpaque(false);
         boardContainerPanel.setLayout(new GridLayout(15, 15));
+
+        Border blackBorder = BorderFactory.createLineBorder(new Color(52, 30, 18, 255),2);
+        boardContainerPanel.setBorder(blackBorder);
+
+        Border emptyBorder = BorderFactory.createEmptyBorder(24, 21, 24, 21);
+        boardContainerPanel.setBorder(BorderFactory.createCompoundBorder(blackBorder, emptyBorder));
+
+        // Agregar números en una línea debajo de cada columna
+//        JPanel columnNumbersPanel = new JPanel();
+//        columnNumbersPanel.setOpaque(false);
+//        columnNumbersPanel.setLayout(new GridLayout(15, 1)); // Ajustar el espacio horizontal
+////
+//        // Agregar números en una línea a la izquierda de cada fila
+//        JPanel rowNumbersPanel = new JPanel();
+//        rowNumbersPanel.setOpaque(false);
+//        rowNumbersPanel.setLayout(new GridLayout(15, 1));
 
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 JPanel panel = new JPanel();
+                panel.setOpaque(false);
                 panel.setPreferredSize(new Dimension(40, 40));
-                panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                panel.setBorder(BorderFactory.createLineBorder(new Color(52, 30, 18, 255)));
                 boardPanels[i][j] = panel;
                 boardContainerPanel.add(panel);
             }
+//            JLabel columnLabel = new JLabel(String.format("%d", i + 1), SwingConstants.RIGHT);
+//            columnLabel.setForeground(new Color(52, 30, 18, 255));
+//            columnNumbersPanel.add(columnLabel);
+////
+//            JLabel rowLabel = new JLabel(String.format("%d    ", i + 1), SwingConstants.LEFT);
+//            rowLabel.setForeground(new Color(52, 30, 18, 255));
+//            rowNumbersPanel.add(rowLabel);
         }
 
-        borderPanel.add(boardContainerPanel, BorderLayout.CENTER);
-        mainPanel.add(borderPanel, BorderLayout.CENTER);
+        outerPanel.add(boardContainerPanel, BorderLayout.CENTER);
 
-        add(mainPanel);
+//        outerPanel.add(columnNumbersPanel, BorderLayout.NORTH);
+//        outerPanel.add(rowNumbersPanel, BorderLayout.WEST);
+
+        outerOuterPanel.add(outerPanel, BorderLayout.CENTER);
+        add(outerOuterPanel);
     }
 
     private void prepareActionsBoard() {
-        // Aquí puedes agregar acciones específicas del tablero, si es necesario
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                boardPanels[i][j].addMouseListener(new PieceClickListener(this, i, j));
+            }
+        }
     }
+
+
+    public void handlePieceClick(int row, int col) {
+        Color currentPlayerColor = playersColors[currentPlayerTurn - 1];
+        gomoku.makeMove(row, col); // Asegúrate de que makeMove acepte solo row y col como argumentos
+        updateBoardView(); // Actualiza la vista después de cada movimiento
+
+        // Verifica si hay un ganador
+        int winner = gomoku.checkWinner();
+        if (winner != 0) {
+            JOptionPane.showMessageDialog(this, "Player " + winner + " wins!");
+            // Puedes realizar acciones adicionales después de que alguien gane
+        } else {
+            // Cambia al siguiente jugador
+            currentPlayerTurn = (currentPlayerTurn % 2) + 1;
+        }
+    }
+
+
+    private void updateBoardView() {
+        int[][] boardState = gomoku.getBoardState();
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (boardState[i][j] != 0) {
+                    PiecePanel piecePanel = new PiecePanel(playersColors[boardState[i][j] - 1]);
+                    boardPanels[i][j].removeAll();
+                    boardPanels[i][j].add(piecePanel);
+                }
+            }
+        }
+        repaint();
+    }
+
+
+
 
     private void openFile() {
         JFileChooser fileChooser = new JFileChooser();

@@ -1,49 +1,38 @@
 package domain;
 
 public class Gomoku {
-    private int[][] board;
-    private int currentPlayer;
+    private Board board;
+    private Player[] players;
+    private int currentPlayerIndex;
 
     public Gomoku() {
-        // Inicializar el tablero con celdas vacías (0)
-        board = new int[15][15];
-        initializeBoard();
-
-        // Inicializar el jugador actual (1 o 2)
-        currentPlayer = 1;
+        board = new Board();
+        players = new Player[]{new HumanPlayer(), new ComputerPlayer()};
+        currentPlayerIndex = 0;
     }
 
-    private void initializeBoard() {
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 15; j++) {
-                board[i][j] = 0;
-            }
-        }
+    public int checkWinner() {
+        return board.checkWinner();
     }
 
-    public int[][] getBoard() {
-        return board;
+    public int[][] getBoardState() {
+        return board.getBoardState();
     }
 
-    public int getCurrentPlayer() {
-        return currentPlayer;
-    }
+    public void makeMove(int row, int col) {
+        int currentPlayerNumber = currentPlayerIndex + 1;
+        board.makeMove(row, col, currentPlayerNumber);
 
-    public void switchPlayer() {
-        currentPlayer = (currentPlayer == 1) ? 2 : 1;
-    }
-
-    public boolean makeMove(int row, int col) {
-        // Verificar si la casilla está vacía
-        if (board[row][col] == 0) {
-            // Colocar la ficha del jugador actual
-            board[row][col] = currentPlayer;
-            // Cambiar al siguiente jugador
-            switchPlayer();
-            return true;  // Movimiento válido
+        // Verificar si hay un ganador después de cada movimiento
+        int winner = board.checkWinner();
+        if (winner != 0) {
+            System.out.println("Player " + winner + " wins!");
+            // Puedes realizar acciones adicionales después de que alguien gane
         } else {
-            return false;  // Casilla ocupada, movimiento inválido
+            // Cambiar al siguiente jugador
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
         }
     }
 
+    // Otros métodos para manejar la lógica del juego
 }
