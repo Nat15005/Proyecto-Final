@@ -11,7 +11,6 @@ public class Board {
     }
 
     private void initializeBoard() {
-        // Inicializar el estado del tablero
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 boardState[i][j] = 0;
@@ -19,24 +18,21 @@ public class Board {
         }
     }
 
+    public void resetBoard() {
+        initializeBoard();
+    }
     public int[][] getBoardState() {
         return boardState;
     }
 
     public void makeMove(int row, int col, int playerNumber) {
-        // Verificar si la casilla está vacía antes de realizar el movimiento
         if (boardState[row][col] == 0) {
             boardState[row][col] = playerNumber;
-            printBoard();  // Imprimir el estado del tablero después de realizar el movimiento
+            printBoard();
         }
-        // Puedes lanzar una excepción o manejar de alguna otra manera si la casilla ya está ocupada
     }
 
     public int checkWinner() {
-        // Verificar si hay un ganador en filas, columnas o diagonales
-        // Devolver el número del jugador ganador (1 o 2) o 0 si no hay ganador
-
-        // Implementa la lógica para verificar las filas
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < 11; j++) {
                 if (boardState[i][j] != 0 &&

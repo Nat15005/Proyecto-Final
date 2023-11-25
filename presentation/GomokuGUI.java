@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import java.io.File;
 
 public class GomokuGUI extends JFrame {
@@ -21,6 +20,9 @@ public class GomokuGUI extends JFrame {
     private int[] boardPanelSize = {
             15
     };
+    private JPanel boardContainerPanel;
+    private ImagePanel outerOuterPanel;
+    private JPanel outerPanel;
 
     public GomokuGUI() {
         setTitle("Gomoku POOs");
@@ -92,8 +94,9 @@ public class GomokuGUI extends JFrame {
                             String itemName = menuItem.getText();
                             switch (itemName) {
                                 case "Nuevo":
-                                    JOptionPane.showMessageDialog(null, "Función Nuevo en construcción");
-                                    break;
+                                    optionNew();
+                                break;
+
                                 case "Abrir":
                                     openFile();
                                     break;
@@ -111,9 +114,28 @@ public class GomokuGUI extends JFrame {
             }
         }
     }
-private JPanel boardContainerPanel;
-    private ImagePanel outerOuterPanel;
-    private JPanel outerPanel;
+
+    private void optionNew() {
+        int option = JOptionPane.showConfirmDialog(null, "¿Quieres empezar un nuevo juego?", "Nuevo juego", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            resetBoard();
+        }
+    }
+    private void resetBoard() {
+        gomoku.resetGame();
+//        currentPlayerTurn = 1;
+
+        // Limpia los paneles y vuelve a agregarlos al tablero
+        for (int i = 0; i < boardPanelSize[0]; i++) {
+            for (int j = 0; j < boardPanelSize[0]; j++) {
+//                PiecePanel piecePanel = new PiecePanel(Color.BLACK);
+                boardPanels[i][j].removeAll();
+//                boardPanels[i][j].add(piecePanel);
+                boardPanels[i][j].revalidate();
+                boardPanels[i][j].repaint();
+            }
+        }
+    }
     private void prepareElementsBoard() {
         String imagePath = "../images/img.jpg";
         outerOuterPanel = new ImagePanel(imagePath); // panel
@@ -171,6 +193,7 @@ private JPanel boardContainerPanel;
         int winner = gomoku.checkWinner();
         if (winner != 0) {
             JOptionPane.showMessageDialog(this, "Player " + winner + " wins!");
+            resetBoard();
         } else {
             currentPlayerTurn = (currentPlayerTurn % 2) + 1;
             PiecePanel piecePanel = new PiecePanel(currentPlayerColor);
@@ -180,23 +203,6 @@ private JPanel boardContainerPanel;
             boardPanels[row][col].repaint();
         }
     }
-
-
-//    public void refresh() {
-//        int[][] boardState = gomoku.getBoardState();
-//        for (int i = 0; i < boardPanelSize[0]; i++) {
-//            for (int j = 0; j < boardPanelSize[0]; j++) {
-//                PiecePanel piecePanel = new PiecePanel(playersColors[boardState[i][j] - 1]);
-//                boardPanels[i][j].removeAll();
-//                boardPanels[i][j].add(piecePanel);
-//                boardPanels[i][j].revalidate();
-//                boardPanels[i][j].repaint();
-//            }
-//        }
-//    }
-
-
-
 
     private void updateBoardView() {
         int[][] boardState = gomoku.getBoardState();

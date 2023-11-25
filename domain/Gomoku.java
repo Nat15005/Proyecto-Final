@@ -16,6 +16,10 @@ public class Gomoku {
         return size;
     }
 
+    public void resetGame() {
+        board.resetBoard();
+//        currentPlayerIndex = 0;
+    }
     public int checkWinner() {
         return board.checkWinner();
     }

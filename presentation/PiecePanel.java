@@ -23,15 +23,12 @@ public class PiecePanel extends JPanel {
         int width = getWidth();
         int height = getHeight();
 
-        // Ajusta el tamaño del círculo como un porcentaje del tamaño del JPanel
-        double circleSizePercentage = 0.8;  // Puedes ajustar este valor según tu preferencia
+        double circleSizePercentage = 0.8;
         int circleSize = (int) (Math.min(width, height) * circleSizePercentage);
 
-        // Calcula la posición central del círculo tanto vertical como horizontalmente
         int xOffset = (width - circleSize) / 2;
         int yOffset = (height - circleSize) / 2;
 
-        // Dibuja un círculo en lugar de un rombo
         g2d.setColor(pieceColor);
         g2d.fillOval(xOffset, yOffset, circleSize, circleSize);
     }
