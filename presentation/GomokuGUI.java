@@ -96,7 +96,6 @@ public class GomokuGUI extends JFrame {
                                 case "Nuevo":
                                     optionNew();
                                 break;
-
                                 case "Abrir":
                                     openFile();
                                     break;
@@ -123,19 +122,16 @@ public class GomokuGUI extends JFrame {
     }
     private void resetBoard() {
         gomoku.resetGame();
-//        currentPlayerTurn = 1;
 
-        // Limpia los paneles y vuelve a agregarlos al tablero
         for (int i = 0; i < boardPanelSize[0]; i++) {
             for (int j = 0; j < boardPanelSize[0]; j++) {
-//                PiecePanel piecePanel = new PiecePanel(Color.BLACK);
                 boardPanels[i][j].removeAll();
-//                boardPanels[i][j].add(piecePanel);
                 boardPanels[i][j].revalidate();
                 boardPanels[i][j].repaint();
             }
         }
     }
+
     private void prepareElementsBoard() {
         String imagePath = "../images/img.jpg";
         outerOuterPanel = new ImagePanel(imagePath); // panel
@@ -193,7 +189,7 @@ public class GomokuGUI extends JFrame {
         int winner = gomoku.checkWinner();
         if (winner != 0) {
             JOptionPane.showMessageDialog(this, "Player " + winner + " wins!");
-            resetBoard();
+            winnerBoard(winner);
         } else {
             currentPlayerTurn = (currentPlayerTurn % 2) + 1;
             PiecePanel piecePanel = new PiecePanel(currentPlayerColor);
@@ -204,6 +200,21 @@ public class GomokuGUI extends JFrame {
         }
     }
 
+    private void winnerBoard(int winner) {
+        gomoku.resetGame();
+        currentPlayerTurn = winner;
+
+        // Limpia los paneles y vuelve a agregarlos al tablero
+        for (int i = 0; i < boardPanelSize[0]; i++) {
+            for (int j = 0; j < boardPanelSize[0]; j++) {
+                PiecePanel piecePanel = new PiecePanel(playersColors[winner-1]);
+                boardPanels[i][j].removeAll();
+                boardPanels[i][j].add(piecePanel);
+                boardPanels[i][j].revalidate();
+                boardPanels[i][j].repaint();
+            }
+        }
+    }
     private void updateBoardView() {
         int[][] boardState = gomoku.getBoardState();
         for (int i = 0; i < boardPanelSize[0]; i++) {
